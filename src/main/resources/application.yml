@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: tisaicore
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/tisaicore-db}
+    username: ${SPRING_DATASOURCE_USERNAME:tisailag}
+    password: ${SPRING_DATASOURCE_PASSWORD:L4(5dB4,rKH@!OQN}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: false
+
+server:
+  port: 8080
+
+rsa:
+  public-key: classpath:keys/public.pem
+  private-key: classpath:keys/private.pem

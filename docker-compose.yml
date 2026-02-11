@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: tisaicore-postgres
+    environment:
+      POSTGRES_DB: tisaicore
+      POSTGRES_USER: tisai
+      POSTGRES_PASSWORD: tisai123
+    ports:
+      - "5432:5432"
+    volumes:
+      - tisaicore-data:/var/lib/postgresql/data
+
+volumes:
+  tisaicore-data:
