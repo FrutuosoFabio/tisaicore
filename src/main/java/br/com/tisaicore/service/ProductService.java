@@ -2,9 +2,11 @@ package br.com.tisaicore.service;
 
 import br.com.tisaicore.dto.request.CreateProductRequest;
 import br.com.tisaicore.dto.response.ProductResponse;
+import br.com.tisaicore.entity.Brand;
 import br.com.tisaicore.entity.Category;
 import br.com.tisaicore.entity.Product;
 import br.com.tisaicore.exception.ResourceNotFoundException;
+import br.com.tisaicore.repository.BrandRepository;
 import br.com.tisaicore.repository.CategoryRepository;
 import br.com.tisaicore.repository.ProductRepository;
 import org.springframework.data.domain.Page;
@@ -16,10 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final BrandRepository brandRepository;
     private final CategoryRepository categoryRepository;
 
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
+    public ProductService(ProductRepository productRepository,
+                          BrandRepository brandRepository,
+                          CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
+        this.brandRepository = brandRepository;
         this.categoryRepository = categoryRepository;
     }
 
@@ -34,6 +40,12 @@ public class ProductService {
         product.setDescription(request.description());
         product.setSku(request.sku());
         product.setPrice(request.price());
+
+        if (request.brandId() != null) {
+            Brand brand = brandRepository.findById(request.brandId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Brand", request.brandId()));
+            product.setBrand(brand);
+        }
 
         if (request.categoryId() != null) {
             Category category = categoryRepository.findById(request.categoryId())
@@ -61,6 +73,14 @@ public class ProductService {
         product.setDescription(request.description());
         product.setSku(request.sku());
         product.setPrice(request.price());
+
+        if (request.brandId() != null) {
+            Brand brand = brandRepository.findById(request.brandId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Brand", request.brandId()));
+            product.setBrand(brand);
+        } else {
+            product.setBrand(null);
+        }
 
         if (request.categoryId() != null) {
             Category category = categoryRepository.findById(request.categoryId())

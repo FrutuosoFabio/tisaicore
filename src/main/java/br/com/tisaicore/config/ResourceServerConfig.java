@@ -26,16 +26,19 @@ public class ResourceServerConfig {
     @Order(2)
     public SecurityFilterChain resourceServerSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/api/**", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**")
+                .securityMatcher("/api/**", "/uploads/**", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**")
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/register").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/products/*/images/**").permitAll()
                         .requestMatchers("/api/v1/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/stock/products/**").hasAnyRole("ADMIN", "MANAGER", "SELLER")
                         .requestMatchers("/api/v1/stock/**").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers("/api/v1/companies/**").hasAnyRole("ADMIN", "MANAGER")
+                        .requestMatchers("/api/v1/brands/**").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers("/api/v1/categories/**").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers("/api/v1/products/**").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers(HttpMethod.GET, "/api/v1/orders/**").hasAnyRole("ADMIN", "MANAGER", "SELLER")

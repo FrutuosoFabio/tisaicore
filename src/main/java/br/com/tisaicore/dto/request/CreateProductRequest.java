@@ -19,5 +19,7 @@ public record CreateProductRequest(
         @Positive(message = "Price must be positive")
         BigDecimal price,
 
+        Long brandId,
+
         Long categoryId
 ) {}
