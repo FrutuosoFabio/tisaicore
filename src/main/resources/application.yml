@@ -32,6 +32,9 @@ rsa:
   public-key: classpath:keys/public.pem
   private-key: classpath:keys/private.pem
 
+admin:
+  default-password: ${ADMIN_DEFAULT_PASSWORD:changeme}
+
 storage:
   gcp:
     bucket-name: ${GCP_BUCKET_NAME:tisaicore-bucket}
