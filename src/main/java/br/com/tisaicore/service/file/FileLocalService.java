@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Service
-@Profile("local")
+@Profile({"local", "prod"})
 public class FileLocalService implements FileService {
 
     @Value("${storage.local.upload-dir:./uploads}")
