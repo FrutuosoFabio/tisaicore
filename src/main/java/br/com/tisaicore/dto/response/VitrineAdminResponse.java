@@ -3,9 +3,8 @@ package br.com.tisaicore.dto.response;
 import br.com.tisaicore.entity.Product;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
-public record ProductResponse(
+public record VitrineAdminResponse(
         Long id,
         String name,
         String description,
@@ -17,17 +16,10 @@ public record ProductResponse(
         Long categoryId,
         String categoryName,
         boolean active,
-        boolean vitrine,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt,
         String imageUrl
 ) {
-    public static ProductResponse from(Product product) {
-        return from(product, null);
-    }
-
-    public static ProductResponse from(Product product, String imageUrl) {
-        return new ProductResponse(
+    public static VitrineAdminResponse from(Product product, String imageUrl) {
+        return new VitrineAdminResponse(
                 product.getId(),
                 product.getName(),
                 product.getDescription(),
@@ -39,9 +31,6 @@ public record ProductResponse(
                 product.getCategory() != null ? product.getCategory().getId() : null,
                 product.getCategory() != null ? product.getCategory().getName() : null,
                 product.isActive(),
-                product.isVitrine(),
-                product.getCreatedAt(),
-                product.getUpdatedAt(),
                 imageUrl
         );
     }

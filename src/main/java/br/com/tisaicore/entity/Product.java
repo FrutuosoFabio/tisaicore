@@ -38,6 +38,9 @@ public class Product {
     @Column(nullable = false)
     private boolean active = true;
 
+    @Column(nullable = false)
+    private boolean vitrine = false;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -123,6 +126,14 @@ public class Product {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public boolean isVitrine() {
+        return vitrine;
+    }
+
+    public void setVitrine(boolean vitrine) {
+        this.vitrine = vitrine;
     }
 
     public LocalDateTime getCreatedAt() {

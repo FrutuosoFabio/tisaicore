@@ -28,14 +28,14 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<Page<ProductResponse>> findAll(
             Pageable pageable,
-            @RequestParam(defaultValue = "false") boolean image) {
+            @RequestParam(name = "image", defaultValue = "false") boolean image) {
         return ResponseEntity.ok(productService.findAll(pageable, image));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> findById(
             @PathVariable Long id,
-            @RequestParam(defaultValue = "false") boolean image) {
+            @RequestParam(name = "image", defaultValue = "false") boolean image) {
         return ResponseEntity.ok(productService.findById(id, image));
     }
 

@@ -47,6 +47,8 @@ public class ResourceServerConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/register").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/products/*/images/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/public/**").permitAll()
+                        .requestMatchers("/api/v1/vitrine/**").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers("/api/v1/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/stock/products/**").hasAnyRole("ADMIN", "MANAGER", "SELLER")
                         .requestMatchers("/api/v1/stock/**").hasAnyRole("ADMIN", "MANAGER")
