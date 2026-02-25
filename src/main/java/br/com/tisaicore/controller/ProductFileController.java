@@ -41,7 +41,7 @@ public class ProductFileController {
     public ResponseEntity<ProductImageResponse> upload(
             @PathVariable Long productId,
             @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "displayOrder", defaultValue = "0") Integer displayOrder) throws IOException {
+            @RequestParam(value = "displayOrder", defaultValue = "0") Long displayOrder) throws IOException {
 
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().build();
@@ -55,11 +55,11 @@ public class ProductFileController {
         ProductImage productImage = new ProductImage();
         productImage.setProduct(product);
         productImage.setSisFile(sisFile);
-        productImage.setDisplayOrder(displayOrder);
-        productImageRepository.save(productImage);
+        productImage.setDisplayOrder(Integer.valueOf(displayOrder.intValue()));
+        ProductImage saved = productImageRepository.save(productImage);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ProductImageResponse.from(productImage, fileService.getUrl(sisFile)));
+                .body(ProductImageResponse.from(saved, fileService.getUrl(sisFile)));
     }
 
     @GetMapping

@@ -23,7 +23,7 @@ public class FileLocalService implements FileService {
     @Value("${storage.local.upload-dir:./uploads}")
     private String uploadDir;
 
-    @Value("${storage.local.base-url:http://localhost:8080}")
+    @Value("${storage.local.base-url:http://localhost/public}")
     private String baseUrl;
 
     private final SisFileRepository sisFileRepository;
@@ -33,7 +33,6 @@ public class FileLocalService implements FileService {
     }
 
     @Override
-    @Transactional
     public SisFile upload(MultipartFile file) throws IOException {
         String extension = getExtension(file.getOriginalFilename());
         String datePath = new SimpleDateFormat("yyyyMM").format(new Date());
@@ -62,7 +61,7 @@ public class FileLocalService implements FileService {
 
     @Override
     public String getUrl(SisFile sisFile) {
-        return baseUrl + "/uploads/" + sisFile.getStoragePath();
+        return baseUrl + "/" + sisFile.getStoragePath();
     }
 
     private String getExtension(String filename) {

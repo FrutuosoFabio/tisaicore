@@ -8,7 +8,9 @@ import br.com.tisaicore.entity.Product;
 import br.com.tisaicore.exception.ResourceNotFoundException;
 import br.com.tisaicore.repository.BrandRepository;
 import br.com.tisaicore.repository.CategoryRepository;
+import br.com.tisaicore.repository.ProductImageRepository;
 import br.com.tisaicore.repository.ProductRepository;
+import br.com.tisaicore.service.file.FileService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,13 +22,19 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final BrandRepository brandRepository;
     private final CategoryRepository categoryRepository;
+    private final ProductImageRepository productImageRepository;
+    private final FileService fileService;
 
     public ProductService(ProductRepository productRepository,
                           BrandRepository brandRepository,
-                          CategoryRepository categoryRepository) {
+                          CategoryRepository categoryRepository,
+                          ProductImageRepository productImageRepository,
+                          FileService fileService) {
         this.productRepository = productRepository;
         this.brandRepository = brandRepository;
         this.categoryRepository = categoryRepository;
+        this.productImageRepository = productImageRepository;
+        this.fileService = fileService;
     }
 
     @Transactional
@@ -57,13 +65,25 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ProductResponse> findAll(Pageable pageable) {
-        return productRepository.findAll(pageable).map(ProductResponse::from);
+    public Page<ProductResponse> findAll(Pageable pageable, boolean withImage) {
+        return productRepository.findAll(pageable).map(product -> {
+            String imageUrl = withImage ? resolveImageUrl(product.getId()) : null;
+            return ProductResponse.from(product, imageUrl);
+        });
     }
 
     @Transactional(readOnly = true)
-    public ProductResponse findById(Long id) {
-        return ProductResponse.from(findEntityById(id));
+    public ProductResponse findById(Long id, boolean withImage) {
+        Product product = findEntityById(id);
+        String imageUrl = withImage ? resolveImageUrl(id) : null;
+        return ProductResponse.from(product, imageUrl);
+    }
+
+    private String resolveImageUrl(Long productId) {
+        return productImageRepository
+                .findFirstByProductIdAndActiveTrueOrderByDisplayOrderAsc(productId)
+                .map(img -> fileService.getUrl(img.getSisFile()))
+                .orElse(null);
     }
 
     @Transactional

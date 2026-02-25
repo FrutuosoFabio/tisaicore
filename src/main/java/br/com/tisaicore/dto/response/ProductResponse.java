@@ -18,9 +18,14 @@ public record ProductResponse(
         String categoryName,
         boolean active,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        String imageUrl
 ) {
     public static ProductResponse from(Product product) {
+        return from(product, null);
+    }
+
+    public static ProductResponse from(Product product, String imageUrl) {
         return new ProductResponse(
                 product.getId(),
                 product.getName(),
@@ -34,7 +39,8 @@ public record ProductResponse(
                 product.getCategory() != null ? product.getCategory().getName() : null,
                 product.isActive(),
                 product.getCreatedAt(),
-                product.getUpdatedAt()
+                product.getUpdatedAt(),
+                imageUrl
         );
     }
 }
