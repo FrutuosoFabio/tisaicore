@@ -28,6 +28,10 @@ public class StockMovement {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "batch_id")
+    private Batch batch;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -82,6 +86,14 @@ public class StockMovement {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Batch getBatch() {
+        return batch;
+    }
+
+    public void setBatch(Batch batch) {
+        this.batch = batch;
     }
 
     public LocalDateTime getCreatedAt() {

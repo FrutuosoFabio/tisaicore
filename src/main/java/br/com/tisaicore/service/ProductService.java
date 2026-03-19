@@ -39,7 +39,8 @@ public class ProductService {
 
     @Transactional
     public ProductResponse create(CreateProductRequest request) {
-        if (productRepository.existsBySku(request.sku())) {
+        if (request.sku() != null && !request.sku().isBlank()
+                && productRepository.existsBySku(request.sku())) {
             throw new IllegalArgumentException("SKU already exists: " + request.sku());
         }
 

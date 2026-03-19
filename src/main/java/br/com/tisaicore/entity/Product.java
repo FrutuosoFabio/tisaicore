@@ -18,7 +18,7 @@ public class Product {
 
     private String description;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String sku;
 
     @Column(nullable = false, precision = 12, scale = 2)

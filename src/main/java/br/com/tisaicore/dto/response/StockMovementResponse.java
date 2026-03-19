@@ -13,6 +13,8 @@ public record StockMovementResponse(
         Integer quantity,
         String reason,
         String userName,
+        Long batchId,
+        String batchCode,
         LocalDateTime createdAt
 ) {
     public static StockMovementResponse from(StockMovement movement) {
@@ -24,6 +26,8 @@ public record StockMovementResponse(
                 movement.getQuantity(),
                 movement.getReason(),
                 movement.getUser().getName(),
+                movement.getBatch() != null ? movement.getBatch().getId() : null,
+                movement.getBatch() != null ? movement.getBatch().getCode() : null,
                 movement.getCreatedAt()
         );
     }

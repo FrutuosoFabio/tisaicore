@@ -15,5 +15,7 @@ public record StockMovementRequest(
         @Positive(message = "Quantity must be positive")
         Integer quantity,
 
-        String reason
+        String reason,
+
+        Long batchId
 ) {}

@@ -12,7 +12,6 @@ public record CreateProductRequest(
 
         String description,
 
-        @NotBlank(message = "SKU is required")
         String sku,
 
         @NotNull(message = "Price is required")
