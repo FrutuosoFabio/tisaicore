@@ -1,5 +1,6 @@
 package br.com.tisaicore.controller;
 
+import br.com.tisaicore.dto.request.AssignBatchRequest;
 import br.com.tisaicore.dto.request.CreateOrderRequest;
 import br.com.tisaicore.dto.response.OrderResponse;
 import br.com.tisaicore.entity.OrderStatus;
@@ -40,15 +41,22 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderResponse> findById(@PathVariable Long id) {
+    public ResponseEntity<OrderResponse> findById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(orderService.findById(id));
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<OrderResponse> updateStatus(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody Map<String, String> body) {
         OrderStatus status = OrderStatus.valueOf(body.get("status"));
         return ResponseEntity.ok(orderService.updateStatus(id, status));
+    }
+
+    @PatchMapping("/{id}/batches")
+    public ResponseEntity<OrderResponse> assignBatches(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody AssignBatchRequest request) {
+        return ResponseEntity.ok(orderService.assignBatches(id, request));
     }
 }

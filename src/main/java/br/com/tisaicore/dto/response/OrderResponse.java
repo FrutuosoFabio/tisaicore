@@ -24,7 +24,9 @@ public record OrderResponse(
             String productName,
             Integer quantity,
             BigDecimal unitPrice,
-            BigDecimal totalPrice
+            BigDecimal totalPrice,
+            Long batchId,
+            String batchCode
     ) {}
 
     public static OrderResponse from(Order order) {
@@ -35,7 +37,9 @@ public record OrderResponse(
                         item.getProduct().getName(),
                         item.getQuantity(),
                         item.getUnitPrice(),
-                        item.getTotalPrice()
+                        item.getTotalPrice(),
+                        item.getBatch() != null ? item.getBatch().getId() : null,
+                        item.getBatch() != null ? item.getBatch().getCode() : null
                 ))
                 .toList();
 

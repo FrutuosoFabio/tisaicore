@@ -12,6 +12,7 @@ public record UserResponse(
         Role role,
         boolean active,
         boolean emailActive,
+        Long companyId,
         String companyName,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
@@ -24,6 +25,7 @@ public record UserResponse(
                 user.getRole(),
                 user.isActive(),
                 user.isEmailActive(),
+                user.getCompany() != null ? user.getCompany().getId() : null,
                 user.getCompany() != null ? user.getCompany().getTradeName() : null,
                 user.getCreatedAt(),
                 user.getUpdatedAt()

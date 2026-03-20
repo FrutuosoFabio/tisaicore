@@ -1,5 +1,6 @@
 package br.com.tisaicore.service;
 
+import br.com.tisaicore.dto.request.AssignBatchRequest;
 import br.com.tisaicore.dto.request.CreateOrderRequest;
 import br.com.tisaicore.dto.response.OrderResponse;
 import br.com.tisaicore.entity.*;
@@ -18,15 +19,18 @@ public class OrderService {
     private final ProductService productService;
     private final CompanyService companyService;
     private final UserService userService;
+    private final BatchService batchService;
 
     public OrderService(OrderRepository orderRepository,
                         ProductService productService,
                         CompanyService companyService,
-                        UserService userService) {
+                        UserService userService,
+                        BatchService batchService) {
         this.orderRepository = orderRepository;
         this.productService = productService;
         this.companyService = companyService;
         this.userService = userService;
+        this.batchService = batchService;
     }
 
     @Transactional
@@ -92,6 +96,48 @@ public class OrderService {
         }
 
         order.setStatus(status);
+        return OrderResponse.from(orderRepository.save(order));
+    }
+
+    @Transactional
+    public OrderResponse assignBatches(Long orderId, AssignBatchRequest request) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order", orderId));
+
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new IllegalArgumentException("Cannot assign batches to a cancelled order");
+        }
+
+        for (AssignBatchRequest.ItemBatch itemBatch : request.items()) {
+            OrderItem orderItem = order.getItems().stream()
+                    .filter(i -> i.getId().equals(itemBatch.orderItemId()))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "Order item not found: " + itemBatch.orderItemId()));
+
+            Batch batch = batchService.findEntityById(itemBatch.batchId());
+
+            if (!batch.getProduct().getId().equals(orderItem.getProduct().getId())) {
+                throw new IllegalArgumentException(
+                        "Batch " + batch.getCode() + " does not belong to product " + orderItem.getProduct().getName());
+            }
+
+            // Se já tinha lote atribuído, devolve a quantidade ao lote anterior
+            if (orderItem.getBatch() != null) {
+                Batch previousBatch = orderItem.getBatch();
+                previousBatch.setCurrentQuantity(previousBatch.getCurrentQuantity() + orderItem.getQuantity());
+            }
+
+            // Desconta do novo lote
+            if (batch.getCurrentQuantity() < orderItem.getQuantity()) {
+                throw new InsufficientStockException(
+                        "Batch " + batch.getCode(), batch.getCurrentQuantity(), orderItem.getQuantity());
+            }
+            batch.setCurrentQuantity(batch.getCurrentQuantity() - orderItem.getQuantity());
+
+            orderItem.setBatch(batch);
+        }
+
         return OrderResponse.from(orderRepository.save(order));
     }
 }
