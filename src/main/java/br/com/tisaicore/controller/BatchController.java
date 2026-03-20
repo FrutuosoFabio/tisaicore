@@ -34,13 +34,13 @@ public class BatchController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BatchResponse> findById(@PathVariable Long id) {
+    public ResponseEntity<BatchResponse> findById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(batchService.findById(id));
     }
 
     @GetMapping("/product/{productId}")
     public ResponseEntity<Page<BatchResponse>> findByProduct(
-            @PathVariable Long productId, Pageable pageable) {
+            @PathVariable("productId") Long productId, Pageable pageable) {
         return ResponseEntity.ok(batchService.findByProductId(productId, pageable));
     }
 
@@ -51,18 +51,18 @@ public class BatchController {
 
     @GetMapping("/expiring-soon")
     public ResponseEntity<List<BatchResponse>> findExpiringSoon(
-            @RequestParam(defaultValue = "30") int days) {
+            @RequestParam(name = "days", defaultValue = "30") int days) {
         return ResponseEntity.ok(batchService.findExpiringSoon(days));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<BatchResponse> update(
-            @PathVariable Long id, @Valid @RequestBody UpdateBatchRequest request) {
+            @PathVariable("id") Long id, @Valid @RequestBody UpdateBatchRequest request) {
         return ResponseEntity.ok(batchService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         batchService.delete(id);
         return ResponseEntity.noContent().build();
     }
