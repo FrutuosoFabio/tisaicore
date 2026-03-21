@@ -28,19 +28,29 @@ public class BatchService {
 
     @Transactional
     public BatchResponse create(CreateBatchRequest request) {
-        if (batchRepository.existsByCode(request.code())) {
-            throw new IllegalArgumentException("Batch code already exists: " + request.code());
+        String code = request.code();
+        if (code != null && !code.isBlank()) {
+            if (batchRepository.existsByCode(code)) {
+                throw new IllegalArgumentException("Código do lote já existe: " + code);
+            }
+        } else {
+            code = "LT-" + System.currentTimeMillis();
         }
 
         Product product = productService.findEntityById(request.productId());
 
+        if (request.initialQuantity() > product.getStockQuantity()) {
+            throw new IllegalArgumentException(
+                    "Quantidade do lote (" + request.initialQuantity() + ") não pode ser maior que o estoque do produto (" + product.getStockQuantity() + ")");
+        }
+
         if (request.manufacturingDate() != null && request.expirationDate() != null
                 && request.manufacturingDate().isAfter(request.expirationDate())) {
-            throw new IllegalArgumentException("Manufacturing date cannot be after expiration date");
+            throw new IllegalArgumentException("Data de fabricação não pode ser posterior à data de validade");
         }
 
         Batch batch = new Batch();
-        batch.setCode(request.code());
+        batch.setCode(code);
         batch.setProduct(product);
         batch.setExpirationDate(request.expirationDate());
         batch.setManufacturingDate(request.manufacturingDate());
@@ -100,7 +110,7 @@ public class BatchService {
 
         if (batch.getManufacturingDate() != null && batch.getExpirationDate() != null
                 && batch.getManufacturingDate().isAfter(batch.getExpirationDate())) {
-            throw new IllegalArgumentException("Manufacturing date cannot be after expiration date");
+            throw new IllegalArgumentException("Data de fabricação não pode ser posterior à data de validade");
         }
 
         return BatchResponse.from(batchRepository.save(batch));

@@ -31,18 +31,18 @@ public class CompanyController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CompanyResponse> findById(@PathVariable Long id) {
+    public ResponseEntity<CompanyResponse> findById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(companyService.findById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CompanyResponse> update(@PathVariable Long id,
+    public ResponseEntity<CompanyResponse> update(@PathVariable("id") Long id,
                                                   @Valid @RequestBody CreateCompanyRequest request) {
         return ResponseEntity.ok(companyService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         companyService.delete(id);
         return ResponseEntity.noContent().build();
     }

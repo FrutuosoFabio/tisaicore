@@ -37,17 +37,22 @@ public class ProductService {
         this.fileService = fileService;
     }
 
+    private String normalizeSku(String sku) {
+        if (sku == null || sku.isBlank()) return null;
+        return sku.trim();
+    }
+
     @Transactional
     public ProductResponse create(CreateProductRequest request) {
-        if (request.sku() != null && !request.sku().isBlank()
-                && productRepository.existsBySku(request.sku())) {
-            throw new IllegalArgumentException("SKU already exists: " + request.sku());
+        String sku = normalizeSku(request.sku());
+        if (sku != null && productRepository.existsBySku(sku)) {
+            throw new IllegalArgumentException("SKU já cadastrado: " + sku);
         }
 
         Product product = new Product();
         product.setName(request.name());
         product.setDescription(request.description());
-        product.setSku(request.sku());
+        product.setSku(sku);
         product.setPrice(request.price());
 
         if (request.brandId() != null) {
@@ -90,9 +95,13 @@ public class ProductService {
     @Transactional
     public ProductResponse update(Long id, CreateProductRequest request) {
         Product product = findEntityById(id);
+        String sku = normalizeSku(request.sku());
+        if (sku != null && !sku.equals(product.getSku()) && productRepository.existsBySku(sku)) {
+            throw new IllegalArgumentException("SKU já cadastrado: " + sku);
+        }
         product.setName(request.name());
         product.setDescription(request.description());
-        product.setSku(request.sku());
+        product.setSku(sku);
         product.setPrice(request.price());
 
         if (request.brandId() != null) {

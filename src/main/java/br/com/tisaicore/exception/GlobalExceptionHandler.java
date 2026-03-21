@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now().toString());
         body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Validation failed");
+        body.put("error", "Erro de validação");
         body.put("details", errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }

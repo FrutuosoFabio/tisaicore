@@ -34,19 +34,19 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> findById(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestParam(name = "image", defaultValue = "false") boolean image) {
         return ResponseEntity.ok(productService.findById(id, image));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductResponse> update(@PathVariable Long id,
+    public ResponseEntity<ProductResponse> update(@PathVariable("id") Long id,
                                                   @Valid @RequestBody CreateProductRequest request) {
         return ResponseEntity.ok(productService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         productService.delete(id);
         return ResponseEntity.noContent().build();
     }

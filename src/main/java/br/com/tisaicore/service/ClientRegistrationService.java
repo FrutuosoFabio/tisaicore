@@ -37,12 +37,12 @@ public class ClientRegistrationService {
         CnpjResponse cnpjResponse = cnpjValidationService.validate(request.cnpj());
 
         if (userRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("Email already in use: " + request.email());
+            throw new IllegalArgumentException("E-mail já está em uso: " + request.email());
         }
 
         String sanitizedCnpj = request.cnpj().replaceAll("[^0-9]", "");
         if (companyRepository.existsByCnpj(sanitizedCnpj)) {
-            throw new IllegalArgumentException("CNPJ already registered: " + sanitizedCnpj);
+            throw new IllegalArgumentException("CNPJ já cadastrado: " + sanitizedCnpj);
         }
 
         Company company = new Company();

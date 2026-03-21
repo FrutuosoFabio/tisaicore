@@ -33,18 +33,18 @@ public class BrandController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BrandResponse> findById(@PathVariable Long id) {
+    public ResponseEntity<BrandResponse> findById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(brandService.findById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BrandResponse> update(@PathVariable Long id,
+    public ResponseEntity<BrandResponse> update(@PathVariable("id") Long id,
                                                  @Valid @RequestBody BrandRequest request) {
         return ResponseEntity.ok(brandService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         brandService.delete(id);
         return ResponseEntity.noContent().build();
     }

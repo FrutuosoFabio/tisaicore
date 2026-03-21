@@ -21,7 +21,7 @@ public class CnpjValidationService {
         String sanitizedCnpj = cnpj.replaceAll("[^0-9]", "");
 
         if (sanitizedCnpj.length() != 14) {
-            throw new CnpjValidationException("Invalid CNPJ format: must contain 14 digits");
+            throw new CnpjValidationException("Formato de CNPJ inválido: deve conter 14 dígitos");
         }
 
         CnpjResponse response;
@@ -31,16 +31,16 @@ public class CnpjValidationService {
                     .retrieve()
                     .body(CnpjResponse.class);
         } catch (RestClientResponseException ex) {
-            throw new CnpjValidationException("CNPJ not found: " + sanitizedCnpj);
+            throw new CnpjValidationException("CNPJ não encontrado: " + sanitizedCnpj);
         }
 
         if (response == null) {
-            throw new CnpjValidationException("CNPJ not found: " + sanitizedCnpj);
+            throw new CnpjValidationException("CNPJ não encontrado: " + sanitizedCnpj);
         }
 
         if (!"ATIVA".equalsIgnoreCase(response.descricaoSituacaoCadastral())) {
             throw new CnpjValidationException(
-                    "CNPJ is not active. Current status: " + response.descricaoSituacaoCadastral()
+                    "CNPJ não está ativo. Situação atual: " + response.descricaoSituacaoCadastral()
             );
         }
 

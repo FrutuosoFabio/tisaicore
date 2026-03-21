@@ -39,7 +39,7 @@ public class ProductFileController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Upload de imagem para um produto")
     public ResponseEntity<ProductImageResponse> upload(
-            @PathVariable Long productId,
+            @PathVariable("productId") Long productId,
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "displayOrder", defaultValue = "0") Long displayOrder) throws IOException {
 
@@ -64,7 +64,7 @@ public class ProductFileController {
 
     @GetMapping
     @Operation(summary = "Listar imagens de um produto")
-    public ResponseEntity<List<ProductImageResponse>> list(@PathVariable Long productId) {
+    public ResponseEntity<List<ProductImageResponse>> list(@PathVariable("productId") Long productId) {
         if (!productRepository.existsById(productId)) {
             throw new ResourceNotFoundException("Product", productId);
         }
@@ -81,8 +81,8 @@ public class ProductFileController {
     @DeleteMapping("/{imageId}")
     @Operation(summary = "Deletar imagem de um produto")
     public ResponseEntity<Void> delete(
-            @PathVariable Long productId,
-            @PathVariable Long imageId) throws IOException {
+            @PathVariable("productId") Long productId,
+            @PathVariable("imageId") Long imageId) throws IOException {
 
         ProductImage productImage = productImageRepository.findById(imageId)
                 .filter(img -> img.getProduct().getId().equals(productId))

@@ -7,15 +7,15 @@ import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 
 public record CreateProductRequest(
-        @NotBlank(message = "Name is required")
+        @NotBlank(message = "Nome é obrigatório")
         String name,
 
         String description,
 
         String sku,
 
-        @NotNull(message = "Price is required")
-        @Positive(message = "Price must be positive")
+        @NotNull(message = "Preço é obrigatório")
+        @Positive(message = "Preço deve ser positivo")
         BigDecimal price,
 
         Long brandId,

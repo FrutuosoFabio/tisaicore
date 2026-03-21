@@ -41,7 +41,7 @@ public class StockService {
         if (request.batchId() != null) {
             batch = batchService.findEntityById(request.batchId());
             if (!batch.getProduct().getId().equals(product.getId())) {
-                throw new IllegalArgumentException("Batch does not belong to the specified product");
+                throw new IllegalArgumentException("Lote não pertence ao produto especificado");
             }
         }
 

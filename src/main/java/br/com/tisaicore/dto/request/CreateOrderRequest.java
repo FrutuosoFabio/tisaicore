@@ -8,21 +8,21 @@ import jakarta.validation.constraints.Positive;
 import java.util.List;
 
 public record CreateOrderRequest(
-        @NotNull(message = "Company ID is required")
+        @NotNull(message = "Empresa é obrigatória")
         Long companyId,
 
-        @NotEmpty(message = "Order must have at least one item")
+        @NotEmpty(message = "Pedido deve ter pelo menos um item")
         @Valid
         List<OrderItemRequest> items,
 
         String notes
 ) {
     public record OrderItemRequest(
-            @NotNull(message = "Product ID is required")
+            @NotNull(message = "Produto é obrigatório")
             Long productId,
 
-            @NotNull(message = "Quantity is required")
-            @Positive(message = "Quantity must be positive")
+            @NotNull(message = "Quantidade é obrigatória")
+            @Positive(message = "Quantidade deve ser positiva")
             Integer quantity
     ) {}
 }

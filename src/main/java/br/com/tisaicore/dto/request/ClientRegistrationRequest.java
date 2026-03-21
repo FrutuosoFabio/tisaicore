@@ -5,21 +5,21 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record ClientRegistrationRequest(
-        @NotBlank(message = "Name is required")
+        @NotBlank(message = "Nome é obrigatório")
         String name,
 
-        @NotBlank(message = "Email is required")
-        @Email(message = "Invalid email format")
+        @NotBlank(message = "E-mail é obrigatório")
+        @Email(message = "Formato de e-mail inválido")
         String email,
 
-        @NotBlank(message = "Password is required")
-        @Size(min = 6, message = "Password must be at least 6 characters")
+        @NotBlank(message = "Senha é obrigatória")
+        @Size(min = 6, message = "Senha deve ter pelo menos 6 caracteres")
         String password,
 
-        @NotBlank(message = "Trade name is required")
+        @NotBlank(message = "Nome fantasia é obrigatório")
         String tradeName,
 
-        @NotBlank(message = "CNPJ is required")
+        @NotBlank(message = "CNPJ é obrigatório")
         String cnpj,
 
         String phone

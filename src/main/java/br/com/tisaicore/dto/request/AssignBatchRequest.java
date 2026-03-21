@@ -7,15 +7,15 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public record AssignBatchRequest(
-        @NotEmpty(message = "Items are required")
+        @NotEmpty(message = "Itens são obrigatórios")
         @Valid
         List<ItemBatch> items
 ) {
     public record ItemBatch(
-            @NotNull(message = "Order item ID is required")
+            @NotNull(message = "ID do item do pedido é obrigatório")
             Long orderItemId,
 
-            @NotNull(message = "Batch ID is required")
+            @NotNull(message = "ID do lote é obrigatório")
             Long batchId
     ) {}
 }

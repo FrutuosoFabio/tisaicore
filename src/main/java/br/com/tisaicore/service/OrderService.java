@@ -85,7 +85,7 @@ public class OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Order", id));
 
         if (order.getStatus() == OrderStatus.CANCELLED) {
-            throw new IllegalArgumentException("Cannot update a cancelled order");
+            throw new IllegalArgumentException("Não é possível atualizar um pedido cancelado");
         }
 
         if (status == OrderStatus.CANCELLED && order.getStatus() != OrderStatus.CANCELLED) {
@@ -105,7 +105,7 @@ public class OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Order", orderId));
 
         if (order.getStatus() == OrderStatus.CANCELLED) {
-            throw new IllegalArgumentException("Cannot assign batches to a cancelled order");
+            throw new IllegalArgumentException("Não é possível atribuir lotes a um pedido cancelado");
         }
 
         for (AssignBatchRequest.ItemBatch itemBatch : request.items()) {
@@ -119,7 +119,7 @@ public class OrderService {
 
             if (!batch.getProduct().getId().equals(orderItem.getProduct().getId())) {
                 throw new IllegalArgumentException(
-                        "Batch " + batch.getCode() + " does not belong to product " + orderItem.getProduct().getName());
+                        "Lote " + batch.getCode() + " não pertence ao produto " + orderItem.getProduct().getName());
             }
 
             // Se já tinha lote atribuído, devolve a quantidade ao lote anterior

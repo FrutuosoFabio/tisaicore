@@ -30,16 +30,35 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+                .orElseThrow(() -> new IllegalArgumentException("E-mail ou senha inválidos"));
 
         if (!user.isActive()) {
-            throw new IllegalArgumentException("User account is disabled");
+            throw new IllegalArgumentException("Conta de usuário desativada");
         }
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new IllegalArgumentException("Invalid email or password");
+            throw new IllegalArgumentException("E-mail ou senha inválidos");
         }
 
+        return buildLoginResponse(user);
+    }
+
+    /**
+     * Renova o token usando o e-mail do usuário autenticado (extraído do JWT atual).
+     * O token atual ainda precisa ser válido para chegar aqui.
+     */
+    public LoginResponse refresh(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+
+        if (!user.isActive()) {
+            throw new IllegalArgumentException("Conta de usuário desativada");
+        }
+
+        return buildLoginResponse(user);
+    }
+
+    private LoginResponse buildLoginResponse(User user) {
         Instant now = Instant.now();
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("tisaicore")

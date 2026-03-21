@@ -7,10 +7,9 @@ import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
 
 public record CreateBatchRequest(
-        @NotBlank(message = "Batch code is required")
         String code,
 
-        @NotNull(message = "Product ID is required")
+        @NotNull(message = "Produto é obrigatório")
         Long productId,
 
         LocalDate expirationDate,
@@ -19,8 +18,8 @@ public record CreateBatchRequest(
 
         String supplier,
 
-        @NotNull(message = "Initial quantity is required")
-        @Positive(message = "Initial quantity must be positive")
+        @NotNull(message = "Quantidade inicial é obrigatória")
+        @Positive(message = "Quantidade inicial deve ser positiva")
         Integer initialQuantity,
 
         String notes

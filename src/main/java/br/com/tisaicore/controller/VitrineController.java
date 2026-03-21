@@ -24,12 +24,12 @@ public class VitrineController {
     }
 
     @PostMapping("/{productId}")
-    public ResponseEntity<VitrineAdminResponse> add(@PathVariable Long productId) {
+    public ResponseEntity<VitrineAdminResponse> add(@PathVariable("productId") Long productId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(vitrineService.addProduct(productId));
     }
 
     @DeleteMapping("/{productId}")
-    public ResponseEntity<Void> remove(@PathVariable Long productId) {
+    public ResponseEntity<Void> remove(@PathVariable("productId") Long productId) {
         vitrineService.removeProduct(productId);
         return ResponseEntity.noContent().build();
     }

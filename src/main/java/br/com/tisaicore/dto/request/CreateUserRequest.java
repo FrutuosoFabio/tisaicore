@@ -7,17 +7,17 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record CreateUserRequest(
-        @NotBlank(message = "Name is required")
+        @NotBlank(message = "Nome é obrigatório")
         String name,
 
-        @NotBlank(message = "Email is required")
-        @Email(message = "Invalid email format")
+        @NotBlank(message = "E-mail é obrigatório")
+        @Email(message = "Formato de e-mail inválido")
         String email,
 
-        @NotBlank(message = "Password is required")
-        @Size(min = 6, message = "Password must have at least 6 characters")
         String password,
 
-        @NotNull(message = "Role is required")
-        Role role
+        @NotNull(message = "Perfil é obrigatório")
+        Role role,
+
+        Long companyId
 ) {}

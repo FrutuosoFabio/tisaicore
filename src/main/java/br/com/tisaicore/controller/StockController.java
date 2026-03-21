@@ -38,7 +38,7 @@ public class StockController {
 
     @GetMapping("/products/{productId}")
     public ResponseEntity<Page<StockMovementResponse>> findByProduct(
-            @PathVariable Long productId, Pageable pageable) {
+            @PathVariable("productId") Long productId, Pageable pageable) {
         return ResponseEntity.ok(stockService.findByProductId(productId, pageable));
     }
 }

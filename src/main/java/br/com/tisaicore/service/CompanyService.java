@@ -22,7 +22,7 @@ public class CompanyService {
     @Transactional
     public CompanyResponse create(CreateCompanyRequest request) {
         if (companyRepository.existsByCnpj(request.cnpj())) {
-            throw new IllegalArgumentException("CNPJ already registered: " + request.cnpj());
+            throw new IllegalArgumentException("CNPJ já cadastrado: " + request.cnpj());
         }
 
         Company company = new Company();

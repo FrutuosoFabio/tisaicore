@@ -5,14 +5,14 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 public record StockMovementRequest(
-        @NotNull(message = "Product ID is required")
+        @NotNull(message = "Produto é obrigatório")
         Long productId,
 
-        @NotNull(message = "Movement type is required")
+        @NotNull(message = "Tipo de movimentação é obrigatório")
         MovementType type,
 
-        @NotNull(message = "Quantity is required")
-        @Positive(message = "Quantity must be positive")
+        @NotNull(message = "Quantidade é obrigatória")
+        @Positive(message = "Quantidade deve ser positiva")
         Integer quantity,
 
         String reason,
