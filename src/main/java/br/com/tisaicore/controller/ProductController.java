@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/products")
 public class ProductController {
@@ -43,6 +45,17 @@ public class ProductController {
     public ResponseEntity<ProductResponse> update(@PathVariable("id") Long id,
                                                   @Valid @RequestBody CreateProductRequest request) {
         return ResponseEntity.ok(productService.update(id, request));
+    }
+
+    @PatchMapping("/{id}/stock")
+    public ResponseEntity<ProductResponse> updateStock(
+            @PathVariable("id") Long id,
+            @RequestBody Map<String, Integer> body) {
+        Integer quantity = body.get("stockQuantity");
+        if (quantity == null || quantity < 0) {
+            throw new IllegalArgumentException("Quantidade de estoque inválida");
+        }
+        return ResponseEntity.ok(productService.updateStock(id, quantity));
     }
 
     @DeleteMapping("/{id}")

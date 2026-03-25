@@ -124,6 +124,13 @@ public class ProductService {
     }
 
     @Transactional
+    public ProductResponse updateStock(Long id, Integer quantity) {
+        Product product = findEntityById(id);
+        product.setStockQuantity(quantity);
+        return ProductResponse.from(productRepository.save(product));
+    }
+
+    @Transactional
     public void delete(Long id) {
         Product product = findEntityById(id);
         product.setActive(false);
