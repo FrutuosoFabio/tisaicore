@@ -26,7 +26,10 @@ public record OrderResponse(
             BigDecimal unitPrice,
             BigDecimal totalPrice,
             Long batchId,
-            String batchCode
+            String batchCode,
+            boolean cancelled,
+            String cancelReason,
+            LocalDateTime cancelledAt
     ) {}
 
     public static OrderResponse from(Order order) {
@@ -39,7 +42,10 @@ public record OrderResponse(
                         item.getUnitPrice(),
                         item.getTotalPrice(),
                         item.getBatch() != null ? item.getBatch().getId() : null,
-                        item.getBatch() != null ? item.getBatch().getCode() : null
+                        item.getBatch() != null ? item.getBatch().getCode() : null,
+                        item.isCancelled(),
+                        item.getCancelReason(),
+                        item.getCancelledAt()
                 ))
                 .toList();
 

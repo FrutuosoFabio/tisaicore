@@ -31,13 +31,13 @@ public class VitrineService {
 
     @Transactional
     public VitrineAdminResponse addProduct(Long productId) {
-        Product product = findProduct(productId);
+        Product product = findActiveProduct(productId);
 
         if (product.isVitrine()) {
             throw new IllegalArgumentException("Produto já está na vitrine.");
         }
 
-        if (productRepository.countByVitrineTrue() >= MAX_VITRINE_SIZE) {
+        if (productRepository.countByVitrineTrueAndActiveTrue() >= MAX_VITRINE_SIZE) {
             throw new IllegalArgumentException(
                     "A vitrine já está cheia. Máximo de " + MAX_VITRINE_SIZE + " produtos permitidos.");
         }
@@ -61,7 +61,7 @@ public class VitrineService {
 
     @Transactional(readOnly = true)
     public List<VitrineAdminResponse> listAdmin() {
-        return productRepository.findAllByVitrineTrueOrderByIdAsc()
+        return productRepository.findAllByVitrineTrueAndActiveTrueOrderByIdAsc()
                 .stream()
                 .map(p -> VitrineAdminResponse.from(p, resolveImageUrl(p.getId())))
                 .toList();
@@ -69,11 +69,15 @@ public class VitrineService {
 
     @Transactional(readOnly = true)
     public List<VitrinePublicResponse> listPublic() {
-        return productRepository.findAllByVitrineTrueOrderByIdAsc()
+        return productRepository.findAllByVitrineTrueAndActiveTrueOrderByIdAsc()
                 .stream()
-                .filter(Product::isActive)
                 .map(p -> VitrinePublicResponse.from(p, resolveImageUrl(p.getId())))
                 .toList();
+    }
+
+    private Product findActiveProduct(Long productId) {
+        return productRepository.findByIdAndActiveTrue(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", productId));
     }
 
     private Product findProduct(Long productId) {

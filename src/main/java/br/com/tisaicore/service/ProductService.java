@@ -72,7 +72,7 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public Page<ProductResponse> findAll(Pageable pageable, boolean withImage) {
-        return productRepository.findAll(pageable).map(product -> {
+        return productRepository.findAllByActiveTrue(pageable).map(product -> {
             String imageUrl = withImage ? resolveImageUrl(product.getId()) : null;
             return ProductResponse.from(product, imageUrl);
         });
@@ -138,7 +138,7 @@ public class ProductService {
     }
 
     public Product findEntityById(Long id) {
-        return productRepository.findById(id)
+        return productRepository.findByIdAndActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", id));
     }
 }

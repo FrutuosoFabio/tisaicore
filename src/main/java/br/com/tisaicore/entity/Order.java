@@ -34,6 +34,13 @@ public class Order {
 
     private String notes;
 
+    @Column(nullable = false)
+    private boolean active = true;
+
+    private LocalDateTime deletedAt;
+
+    private String deletedReason;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -56,6 +63,7 @@ public class Order {
 
     public void recalculateTotal() {
         this.totalAmount = items.stream()
+                .filter(item -> !item.isCancelled())
                 .map(OrderItem::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
@@ -130,5 +138,29 @@ public class Order {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public String getDeletedReason() {
+        return deletedReason;
+    }
+
+    public void setDeletedReason(String deletedReason) {
+        this.deletedReason = deletedReason;
     }
 }

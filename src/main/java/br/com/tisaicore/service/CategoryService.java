@@ -29,7 +29,7 @@ public class CategoryService {
 
     @Transactional(readOnly = true)
     public Page<CategoryResponse> findAll(Pageable pageable) {
-        return categoryRepository.findAll(pageable).map(CategoryResponse::from);
+        return categoryRepository.findAllByActiveTrue(pageable).map(CategoryResponse::from);
     }
 
     @Transactional(readOnly = true)
@@ -53,7 +53,7 @@ public class CategoryService {
     }
 
     public Category findEntityById(Long id) {
-        return categoryRepository.findById(id)
+        return categoryRepository.findByIdAndActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", id));
     }
 }

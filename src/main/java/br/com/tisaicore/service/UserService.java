@@ -72,7 +72,7 @@ public class UserService implements UserDetailsService {
 
     @Transactional(readOnly = true)
     public Page<UserResponse> findAll(Pageable pageable) {
-        return userRepository.findAll(pageable).map(UserResponse::from);
+        return userRepository.findAllByActiveTrue(pageable).map(UserResponse::from);
     }
 
     @Transactional(readOnly = true)
@@ -109,7 +109,7 @@ public class UserService implements UserDetailsService {
     }
 
     public User findEntityById(Long id) {
-        return userRepository.findById(id)
+        return userRepository.findByIdAndActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", id));
     }
 }

@@ -15,7 +15,11 @@ public interface BatchRepository extends JpaRepository<Batch, Long> {
 
     boolean existsByCode(String code);
 
-    Page<Batch> findByProductId(Long productId, Pageable pageable);
+    Optional<Batch> findByIdAndActiveTrue(Long id);
+
+    Page<Batch> findAllByActiveTrue(Pageable pageable);
+
+    Page<Batch> findByProductIdAndActiveTrue(Long productId, Pageable pageable);
 
     List<Batch> findByProductIdAndActiveTrue(Long productId);
 

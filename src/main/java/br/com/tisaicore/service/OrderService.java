@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 public class OrderService {
 
@@ -69,19 +71,19 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public Page<OrderResponse> findAll(Pageable pageable) {
-        return orderRepository.findAll(pageable).map(OrderResponse::from);
+        return orderRepository.findAllByActiveTrue(pageable).map(OrderResponse::from);
     }
 
     @Transactional(readOnly = true)
     public OrderResponse findById(Long id) {
-        Order order = orderRepository.findById(id)
+        Order order = orderRepository.findByIdAndActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", id));
         return OrderResponse.from(order);
     }
 
     @Transactional
     public OrderResponse updateStatus(Long id, OrderStatus status) {
-        Order order = orderRepository.findById(id)
+        Order order = orderRepository.findByIdAndActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", id));
 
         if (order.getStatus() == OrderStatus.CANCELLED) {
@@ -90,9 +92,15 @@ public class OrderService {
 
         if (status == OrderStatus.CANCELLED && order.getStatus() != OrderStatus.CANCELLED) {
             for (OrderItem item : order.getItems()) {
-                Product product = item.getProduct();
-                product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+                if (item.isCancelled()) {
+                    continue;
+                }
+                returnItemToStock(item);
+                item.setCancelled(true);
+                item.setCancelReason("Pedido cancelado");
+                item.setCancelledAt(LocalDateTime.now());
             }
+            order.recalculateTotal();
         }
 
         order.setStatus(status);
@@ -100,8 +108,36 @@ public class OrderService {
     }
 
     @Transactional
+    public void softDelete(Long id, String reason) {
+        Order order = orderRepository.findByIdAndActiveTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order", id));
+
+        for (OrderItem item : order.getItems()) {
+            if (item.isCancelled()) {
+                continue;
+            }
+            returnItemToStock(item);
+        }
+
+        order.setActive(false);
+        order.setDeletedAt(LocalDateTime.now());
+        order.setDeletedReason(reason);
+        orderRepository.save(order);
+    }
+
+    private void returnItemToStock(OrderItem item) {
+        Product product = item.getProduct();
+        product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+
+        if (item.getBatch() != null) {
+            Batch batch = item.getBatch();
+            batch.setCurrentQuantity(batch.getCurrentQuantity() + item.getQuantity());
+        }
+    }
+
+    @Transactional
     public OrderResponse assignBatches(Long orderId, AssignBatchRequest request) {
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findByIdAndActiveTrue(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", orderId));
 
         if (order.getStatus() == OrderStatus.CANCELLED) {
@@ -136,6 +172,40 @@ public class OrderService {
             batch.setCurrentQuantity(batch.getCurrentQuantity() - orderItem.getQuantity());
 
             orderItem.setBatch(batch);
+        }
+
+        return OrderResponse.from(orderRepository.save(order));
+    }
+
+    @Transactional
+    public OrderResponse cancelOrderItem(Long orderId, Long itemId, String reason) {
+        Order order = orderRepository.findByIdAndActiveTrue(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order", orderId));
+
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new IllegalArgumentException("Não é possível cancelar itens de um pedido já cancelado");
+        }
+
+        OrderItem item = order.getItems().stream()
+                .filter(i -> i.getId().equals(itemId))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("OrderItem", itemId));
+
+        if (item.isCancelled()) {
+            throw new IllegalArgumentException("Este item já foi cancelado");
+        }
+
+        returnItemToStock(item);
+
+        item.setCancelled(true);
+        item.setCancelReason(reason);
+        item.setCancelledAt(LocalDateTime.now());
+
+        order.recalculateTotal();
+
+        boolean allCancelled = order.getItems().stream().allMatch(OrderItem::isCancelled);
+        if (allCancelled) {
+            order.setStatus(OrderStatus.CANCELLED);
         }
 
         return OrderResponse.from(orderRepository.save(order));

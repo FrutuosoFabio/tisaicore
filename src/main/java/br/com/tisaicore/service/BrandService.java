@@ -34,7 +34,7 @@ public class BrandService {
 
     @Transactional(readOnly = true)
     public Page<BrandResponse> findAll(Pageable pageable) {
-        return brandRepository.findAll(pageable).map(BrandResponse::from);
+        return brandRepository.findAllByActiveTrue(pageable).map(BrandResponse::from);
     }
 
     @Transactional(readOnly = true)
@@ -58,7 +58,7 @@ public class BrandService {
     }
 
     public Brand findEntityById(Long id) {
-        return brandRepository.findById(id)
+        return brandRepository.findByIdAndActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Brand", id));
     }
 }

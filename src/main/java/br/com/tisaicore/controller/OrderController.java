@@ -59,4 +59,22 @@ public class OrderController {
             @Valid @RequestBody AssignBatchRequest request) {
         return ResponseEntity.ok(orderService.assignBatches(id, request));
     }
+
+    @PatchMapping("/{id}/items/{itemId}/cancel")
+    public ResponseEntity<OrderResponse> cancelItem(
+            @PathVariable("id") Long id,
+            @PathVariable("itemId") Long itemId,
+            @RequestBody(required = false) Map<String, String> body) {
+        String reason = body != null ? body.get("reason") : null;
+        return ResponseEntity.ok(orderService.cancelOrderItem(id, itemId, reason));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(
+            @PathVariable("id") Long id,
+            @RequestBody(required = false) Map<String, String> body) {
+        String reason = body != null ? body.get("reason") : null;
+        orderService.softDelete(id, reason);
+        return ResponseEntity.noContent().build();
+    }
 }

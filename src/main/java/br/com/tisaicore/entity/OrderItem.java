@@ -2,6 +2,7 @@ package br.com.tisaicore.entity;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "order_items")
@@ -31,6 +32,13 @@ public class OrderItem {
 
     @Column(nullable = false, precision = 14, scale = 2)
     private BigDecimal totalPrice;
+
+    @Column(nullable = false)
+    private boolean cancelled = false;
+
+    private String cancelReason;
+
+    private LocalDateTime cancelledAt;
 
     @PrePersist
     @PreUpdate
@@ -94,5 +102,29 @@ public class OrderItem {
 
     public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
+    }
+
+    public String getCancelReason() {
+        return cancelReason;
+    }
+
+    public void setCancelReason(String cancelReason) {
+        this.cancelReason = cancelReason;
+    }
+
+    public LocalDateTime getCancelledAt() {
+        return cancelledAt;
+    }
+
+    public void setCancelledAt(LocalDateTime cancelledAt) {
+        this.cancelledAt = cancelledAt;
     }
 }

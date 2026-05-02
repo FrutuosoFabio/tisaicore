@@ -64,7 +64,7 @@ public class BatchService {
 
     @Transactional(readOnly = true)
     public Page<BatchResponse> findAll(Pageable pageable) {
-        return batchRepository.findAll(pageable).map(BatchResponse::from);
+        return batchRepository.findAllByActiveTrue(pageable).map(BatchResponse::from);
     }
 
     @Transactional(readOnly = true)
@@ -74,7 +74,7 @@ public class BatchService {
 
     @Transactional(readOnly = true)
     public Page<BatchResponse> findByProductId(Long productId, Pageable pageable) {
-        return batchRepository.findByProductId(productId, pageable).map(BatchResponse::from);
+        return batchRepository.findByProductIdAndActiveTrue(productId, pageable).map(BatchResponse::from);
     }
 
     @Transactional(readOnly = true)
@@ -124,7 +124,7 @@ public class BatchService {
     }
 
     public Batch findEntityById(Long id) {
-        return batchRepository.findById(id)
+        return batchRepository.findByIdAndActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Batch", id));
     }
 }
