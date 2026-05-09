@@ -61,6 +61,7 @@ public class ResourceServerConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/orders/**").hasAnyRole("ADMIN", "MANAGER", "SELLER")
                         .requestMatchers(HttpMethod.POST, "/api/v1/orders/**").hasAnyRole("ADMIN", "MANAGER", "SELLER")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/orders/**").hasAnyRole("ADMIN", "MANAGER")
+                        .requestMatchers("/api/v1/reports/**").hasAnyRole("ADMIN", "MANAGER")
                         .anyRequest().authenticated()
                 )
                 .cors(cors -> {})
