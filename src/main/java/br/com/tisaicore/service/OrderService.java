@@ -22,17 +22,20 @@ public class OrderService {
     private final CompanyService companyService;
     private final UserService userService;
     private final BatchService batchService;
+    private final StockMovementWriter stockMovementWriter;
 
     public OrderService(OrderRepository orderRepository,
                         ProductService productService,
                         CompanyService companyService,
                         UserService userService,
-                        BatchService batchService) {
+                        BatchService batchService,
+                        StockMovementWriter stockMovementWriter) {
         this.orderRepository = orderRepository;
         this.productService = productService;
         this.companyService = companyService;
         this.userService = userService;
         this.batchService = batchService;
+        this.stockMovementWriter = stockMovementWriter;
     }
 
     @Transactional
@@ -53,8 +56,6 @@ public class OrderService {
                         product.getName(), product.getStockQuantity(), itemReq.quantity());
             }
 
-            product.setStockQuantity(product.getStockQuantity() - itemReq.quantity());
-
             OrderItem item = new OrderItem();
             item.setProduct(product);
             item.setQuantity(itemReq.quantity());
@@ -65,8 +66,15 @@ public class OrderService {
         }
 
         order.recalculateTotal();
+        order = orderRepository.save(order);
 
-        return OrderResponse.from(orderRepository.save(order));
+        for (OrderItem item : order.getItems()) {
+            stockMovementWriter.record(
+                    item.getProduct(), MovementType.OUT, item.getQuantity(),
+                    "Pedido #" + order.getId(), user, item.getBatch());
+        }
+
+        return OrderResponse.from(order);
     }
 
     @Transactional(readOnly = true)
@@ -95,7 +103,7 @@ public class OrderService {
                 if (item.isCancelled()) {
                     continue;
                 }
-                returnItemToStock(item);
+                returnItemToStock(item, "Cancelamento pedido #" + order.getId());
                 item.setCancelled(true);
                 item.setCancelReason("Pedido cancelado");
                 item.setCancelledAt(LocalDateTime.now());
@@ -116,7 +124,7 @@ public class OrderService {
             if (item.isCancelled()) {
                 continue;
             }
-            returnItemToStock(item);
+            returnItemToStock(item, "Exclusão pedido #" + order.getId());
         }
 
         order.setActive(false);
@@ -125,14 +133,10 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    private void returnItemToStock(OrderItem item) {
-        Product product = item.getProduct();
-        product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
-
-        if (item.getBatch() != null) {
-            Batch batch = item.getBatch();
-            batch.setCurrentQuantity(batch.getCurrentQuantity() + item.getQuantity());
-        }
+    private void returnItemToStock(OrderItem item, String reason) {
+        stockMovementWriter.record(
+                item.getProduct(), MovementType.IN, item.getQuantity(),
+                reason, item.getOrder().getUser(), item.getBatch());
     }
 
     @Transactional
@@ -195,7 +199,10 @@ public class OrderService {
             throw new IllegalArgumentException("Este item já foi cancelado");
         }
 
-        returnItemToStock(item);
+        String motivo = (reason != null && !reason.isBlank())
+                ? "Cancelamento item pedido #" + order.getId() + ": " + reason
+                : "Cancelamento item pedido #" + order.getId();
+        returnItemToStock(item, motivo);
 
         item.setCancelled(true);
         item.setCancelReason(reason);

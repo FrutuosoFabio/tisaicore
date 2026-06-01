@@ -55,7 +55,7 @@ public class ResourceServerConfig {
                         .requestMatchers("/api/v1/companies/**").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers("/api/v1/brands/**").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers("/api/v1/categories/**").hasAnyRole("ADMIN", "MANAGER")
-                        .requestMatchers(HttpMethod.PATCH, "/api/v1/products/*/stock").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/products/*/stock").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers("/api/v1/products/**").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers("/api/v1/batches/**").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers(HttpMethod.GET, "/api/v1/orders/**").hasAnyRole("ADMIN", "MANAGER", "SELLER")

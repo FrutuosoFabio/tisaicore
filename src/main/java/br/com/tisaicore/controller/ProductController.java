@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -50,12 +52,14 @@ public class ProductController {
     @PatchMapping("/{id}/stock")
     public ResponseEntity<ProductResponse> updateStock(
             @PathVariable("id") Long id,
-            @RequestBody Map<String, Integer> body) {
+            @RequestBody Map<String, Integer> body,
+            @AuthenticationPrincipal Jwt jwt) {
         Integer quantity = body.get("stockQuantity");
         if (quantity == null || quantity < 0) {
             throw new IllegalArgumentException("Quantidade de estoque inválida");
         }
-        return ResponseEntity.ok(productService.updateStock(id, quantity));
+        Long userId = jwt.getClaim("userId");
+        return ResponseEntity.ok(productService.updateStock(id, quantity, userId));
     }
 
     @DeleteMapping("/{id}")

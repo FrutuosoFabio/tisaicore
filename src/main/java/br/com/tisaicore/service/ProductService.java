@@ -4,12 +4,15 @@ import br.com.tisaicore.dto.request.CreateProductRequest;
 import br.com.tisaicore.dto.response.ProductResponse;
 import br.com.tisaicore.entity.Brand;
 import br.com.tisaicore.entity.Category;
+import br.com.tisaicore.entity.MovementType;
 import br.com.tisaicore.entity.Product;
+import br.com.tisaicore.entity.User;
 import br.com.tisaicore.exception.ResourceNotFoundException;
 import br.com.tisaicore.repository.BrandRepository;
 import br.com.tisaicore.repository.CategoryRepository;
 import br.com.tisaicore.repository.ProductImageRepository;
 import br.com.tisaicore.repository.ProductRepository;
+import br.com.tisaicore.repository.UserRepository;
 import br.com.tisaicore.service.file.FileService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,17 +27,23 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final ProductImageRepository productImageRepository;
     private final FileService fileService;
+    private final UserRepository userRepository;
+    private final StockMovementWriter stockMovementWriter;
 
     public ProductService(ProductRepository productRepository,
                           BrandRepository brandRepository,
                           CategoryRepository categoryRepository,
                           ProductImageRepository productImageRepository,
-                          FileService fileService) {
+                          FileService fileService,
+                          UserRepository userRepository,
+                          StockMovementWriter stockMovementWriter) {
         this.productRepository = productRepository;
         this.brandRepository = brandRepository;
         this.categoryRepository = categoryRepository;
         this.productImageRepository = productImageRepository;
         this.fileService = fileService;
+        this.userRepository = userRepository;
+        this.stockMovementWriter = stockMovementWriter;
     }
 
     private String normalizeSku(String sku) {
@@ -124,9 +133,19 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductResponse updateStock(Long id, Integer quantity) {
+    public ProductResponse updateStock(Long id, Integer newQuantity, Long userId) {
         Product product = findEntityById(id);
-        product.setStockQuantity(quantity);
+        int oldQuantity = product.getStockQuantity();
+        int delta = newQuantity - oldQuantity;
+
+        if (delta != 0) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new ResourceNotFoundException("User", userId));
+            MovementType type = delta > 0 ? MovementType.IN : MovementType.OUT;
+            String reason = "Ajuste direto de estoque (" + oldQuantity + " → " + newQuantity + ")";
+            stockMovementWriter.record(product, type, Math.abs(delta), reason, user, null);
+        }
+
         return ProductResponse.from(productRepository.save(product));
     }
 
