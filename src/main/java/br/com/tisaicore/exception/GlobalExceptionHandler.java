@@ -1,7 +1,14 @@
 package br.com.tisaicore.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,9 +18,36 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDenied(AccessDeniedException ex,
+                                                                  HttpServletRequest req) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String subject = "<anon>";
+        String authorities = "<none>";
+        Object scope = null;
+        Object userId = null;
+        if (auth != null) {
+            subject = auth.getName();
+            authorities = auth.getAuthorities().stream()
+                    .map(Object::toString)
+                    .collect(Collectors.joining(","));
+            if (auth.getPrincipal() instanceof Jwt jwt) {
+                scope = jwt.getClaim("scope");
+                userId = jwt.getClaim("userId");
+            }
+        }
+        log.warn("[ACCESS-DENIED] {} {} subject={} userId={} authorities=[{}] scope={}",
+                req.getMethod(), req.getRequestURI(), subject, userId, authorities, scope);
+        return buildResponse(HttpStatus.FORBIDDEN,
+                "Você não tem permissão para realizar essa ação.");
+    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleResourceNotFound(ResourceNotFoundException ex) {
