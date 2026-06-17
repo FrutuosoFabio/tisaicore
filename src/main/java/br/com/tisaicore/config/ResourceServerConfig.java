@@ -37,7 +37,8 @@ public class ResourceServerConfig {
 
     @Bean
     @Order(2)
-    public SecurityFilterChain resourceServerSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain resourceServerSecurityFilterChain(HttpSecurity http,
+                                                                  LoggingAccessDeniedHandler accessDeniedHandler) throws Exception {
         http
                 .securityMatcher("/api/**", "/uploads/**", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**")
                 .authorizeHttpRequests(authorize -> authorize
@@ -65,6 +66,7 @@ public class ResourceServerConfig {
                         .anyRequest().authenticated()
                 )
                 .cors(cors -> {})
+                .exceptionHandling(eh -> eh.accessDeniedHandler(accessDeniedHandler))
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
                 )
