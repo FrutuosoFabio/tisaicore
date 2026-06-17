@@ -16,7 +16,8 @@ import java.time.Instant;
 @Service
 public class AuthService {
 
-    private static final long TOKEN_EXPIRY_SECONDS = 3600;
+    // Sistema interno: token "perpétuo" (10 anos). Só termina com logout manual.
+    private static final long TOKEN_EXPIRY_SECONDS = 60L * 60L * 24L * 365L * 10L;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
